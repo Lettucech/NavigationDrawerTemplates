@@ -25,6 +25,11 @@ public class DrawerMenuListViewAdapter extends RecyclerView.Adapter<GenericViewH
     private Context mContext;
     private List<MenuItemInfo> mItems = new ArrayList<>();
     private RecyclerView mRecyclerView;
+    private OnMenuItemClickListener mListener;
+
+    public interface OnMenuItemClickListener {
+        void onMenuItemClick(String tag);
+    }
 
     public DrawerMenuListViewAdapter(Context context) {
         mContext = context;
@@ -45,19 +50,28 @@ public class DrawerMenuListViewAdapter extends RecyclerView.Adapter<GenericViewH
     @Override
     public void onBindViewHolder(@NonNull GenericViewHolder holder, int position) {
         CustomMenuItem item = (CustomMenuItem) holder.itemView;
-        MenuItemInfo info = mItems.get(position);
+        final MenuItemInfo info = mItems.get(position);
 
         if (info.getIconResId() != null) {
             item.setIcon(info.getIconResId());
         }
         item.setTitle(info.getTitle());
 
-        item.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                toggle(mRecyclerView.indexOfChild(view));
-            }
-        });
+        if (info.getChildItems() != null && !info.getChildItems().isEmpty()) {
+            item.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    toggle(mRecyclerView.indexOfChild(view));
+                }
+            });
+        } else if (mListener != null) {
+            item.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mListener.onMenuItemClick(info.getTag());
+                }
+            });
+        }
     }
 
     @Override
@@ -65,32 +79,28 @@ public class DrawerMenuListViewAdapter extends RecyclerView.Adapter<GenericViewH
         return mItems.size();
     }
 
+    public void setOnMenuItemClickListener(OnMenuItemClickListener listener) {
+        mListener = listener;
+    }
+
     public void setMenu(List<MenuItemInfo> items) {
         mItems.clear();
 
-
         for (int i = 0; i < items.size(); i++) {
-            mItems.addAll(recursiveExpand(items.get(i), null));
+            mItems.addAll(recursiveExpand(items.get(i)));
         }
-
-        for (MenuItemInfo info: mItems) {
-            Log.d(TAG, info.getTag());
-        }
-
     }
 
-    private List<MenuItemInfo> recursiveExpand(MenuItemInfo item, List<MenuItemInfo> items) {
-        if (items == null) {
-            items = new ArrayList<>();
-        }
+    private List<MenuItemInfo> recursiveExpand(MenuItemInfo item) {
+        List<MenuItemInfo> items = new ArrayList<>();
+        items.add(item);
 
         if (!item.isChildExpanded()) {
-            items.add(item);
             return items;
         }
 
-        for (MenuItemInfo child: item.getChildItems()) {
-            items.addAll(recursiveExpand(child, items));
+        for (MenuItemInfo child : item.getChildItems()) {
+            items.addAll(recursiveExpand(child));
         }
         return items;
     }

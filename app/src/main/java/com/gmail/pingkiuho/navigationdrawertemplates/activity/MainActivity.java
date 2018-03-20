@@ -35,7 +35,7 @@ import java.util.List;
  * Created by Brian Ho on 14/3/2018.
  */
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements DrawerMenuListViewAdapter.OnMenuItemClickListener {
     public static final String TAG = MainActivity.class.getSimpleName();
     private DrawerLayout mDrawerLayout;
     private Toolbar mToolbar;
@@ -66,6 +66,15 @@ public class MainActivity extends AppCompatActivity {
         mMenuRecyclerView.setLayoutManager(mLayoutManager);
         mMenuRecyclerView.setAdapter(mMenuRecyclerViewAdapter);
         mMenuRecyclerViewAdapter.setMenu(getMenuData());
+        mMenuRecyclerViewAdapter.setOnMenuItemClickListener(this);
+
+        mContentLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent("com.compass.rewards.uat.action.open");
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -94,6 +103,22 @@ public class MainActivity extends AppCompatActivity {
         setupDrawerToggle().syncState();
     }
 
+    @Override
+    public void onMenuItemClick(String tag) {
+        switch (tag) {
+            case "first-first":
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.frameLayout_content, ContentFragment.newInstance("First First"))
+                        .commit();
+                break;
+            case "first-second":
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.frameLayout_content, ContentFragment.newInstance("First Second"))
+                        .commit();
+                break;
+        }
+    }
+
     private ActionBarDrawerToggle setupDrawerToggle() {
         return new ActionBarDrawerToggle(this, mDrawerLayout, mToolbar, R.string.drawer_open, R.string.drawer_close);
     }
@@ -116,6 +141,7 @@ public class MainActivity extends AppCompatActivity {
                                         MenuItemInfo.builder("second-first").setTitle("Second First").build(),
                                         MenuItemInfo.builder("second-second").setTitle("Second Second").build(),
                                         MenuItemInfo.builder("second-third").setTitle("Second Third").build()))
+                                .setChildExpanded(true)
                                 .build(),
                         MenuItemInfo.builder("third")
                                 .setIconResId(R.drawable.ic_looks_one_black_24dp)
@@ -132,4 +158,6 @@ public class MainActivity extends AppCompatActivity {
         mNavigationView = findViewById(R.id.navigationView);
         mMenuRecyclerView = findViewById(R.id.recyclerView);
     }
+
+
 }
