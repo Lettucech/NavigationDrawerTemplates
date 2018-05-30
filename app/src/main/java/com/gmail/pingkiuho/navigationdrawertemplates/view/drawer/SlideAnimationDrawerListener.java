@@ -11,7 +11,7 @@ public class SlideAnimationDrawerListener extends DrawerLayout.SimpleDrawerListe
     public static final String TAG = SlideAnimationDrawerListener.class.getSimpleName();
 
     public enum Preset {
-        SLIDE_END(0f, 0f, 0f, 0f, 0f, 0f),
+        SLIDE_END(0f, 0f, 0f, 0f, 1f, 1f),
         SLIDE_END_SCALE_DOWN(0f, 0f, 0f, 0f, 0.75f, 0.75f),
         SLIDE_END_SCALE_DOWN_ROTATE_Y(0f, 0f, 0f, -5f, 0.75f, 0.75f);
 
